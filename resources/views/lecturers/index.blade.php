@@ -1,36 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Danh sách giảng viên</title>
-</head>
+@extends('layouts.admin')
 
-<body>
+@section('title', 'Quản lý Giảng viên')
 
-<h2>Danh sách giảng viên</h2>
+@section('content')
 
-<table border="1" cellpadding="10">
+<div class="card">
 
-<tr>
-    <th>ID</th>
-    <th>Mã GV</th>
-    <th>Họ tên</th>
-    <th>Email</th>
-    <th>Số điện thoại</th>
-</tr>
+    <h2>Danh sách giảng viên</h2>
 
-@foreach($lecturers as $lecturer)
 
-<tr>
-    <td>{{ $lecturer->id }}</td>
-    <td>{{ $lecturer->code }}</td>
-    <td>{{ $lecturer->name }}</td>
-    <td>{{ $lecturer->email }}</td>
-    <td>{{ $lecturer->phone }}</td>
-</tr>
+    <table>
 
-@endforeach
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Mã GV</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Số điện thoại</th>
+            </tr>
+        </thead>
 
-</table>
 
-</body>
-</html>
+        <tbody>
+
+        @foreach($lecturers as $lecturer)
+
+            <tr>
+                <td>{{ $lecturer->id }}</td>
+                <td>{{ $lecturer->code }}</td>
+                <td>{{ $lecturer->name }}</td>
+                <td>{{ $lecturer->email }}</td>
+                <td>{{ $lecturer->phone }}</td>
+            </tr>
+
+        @endforeach
+
+        </tbody>
+
+
+    </table>
+
+
+</div>
+
+@endsection
