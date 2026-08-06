@@ -10,9 +10,17 @@ class Lecturer extends Model
         'code',
         'name',
         'email',
-        'phone'
+        'phone',
+        'specialization_id'
     ];
 
+    // Một giảng viên thuộc một chuyên ngành
+    public function specialization()
+    {
+        return $this->belongsTo(Specialization::class);
+    }
+
+    // Một giảng viên có nhiều phân công đề tài
     public function topicAssignments()
     {
         return $this->hasMany(TopicAssignment::class);

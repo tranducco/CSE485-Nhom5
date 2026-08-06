@@ -32,6 +32,7 @@
                 <th>Họ tên</th>
                 <th>Email</th>
                 <th>Số điện thoại</th>
+                <th>Chuyên ngành</th>
             </tr>
         </thead>
 
@@ -46,6 +47,10 @@
                 <td>{{ $lecturer->name }}</td>
                 <td>{{ $lecturer->email }}</td>
                 <td>{{ $lecturer->phone }}</td>
+
+                <td>
+                    {{ $lecturer->specialization->name ?? 'Chưa có' }}
+                </td>
             </tr>
 
         @endforeach

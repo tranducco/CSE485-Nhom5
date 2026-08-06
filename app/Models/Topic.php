@@ -22,13 +22,4 @@ class Topic extends Model
     {
         return $this->hasMany(TopicAssignment::class);
     }
-
-    /**
-     * Quan hệ này để sẵn.
-     * Khi nhóm thêm TopicRegistration thì chỉ cần tạo Model là dùng được.
-     */
-    public function topicRegistrations(): HasMany
-    {
-        return $this->hasMany(TopicRegistration::class);
-    }
 }

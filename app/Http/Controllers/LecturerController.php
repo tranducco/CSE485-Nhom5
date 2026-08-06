@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lecturer;
+use App\Models\Specialization;
 use Illuminate\Http\Request;
 
 class LecturerController extends Controller
 {
+    // Hiển thị danh sách giảng viên
     public function index()
     {
-        $lecturers = Lecturer::all();
+        // Lấy giảng viên kèm thông tin chuyên ngành
+        $lecturers = Lecturer::with('specialization')->get();
 
         return view('lecturers.index', compact('lecturers'));
     }
@@ -18,7 +21,10 @@ class LecturerController extends Controller
     // Hiển thị form thêm giảng viên
     public function create()
     {
-        return view('lecturers.create');
+        // Lấy danh sách chuyên ngành để chọn
+        $specializations = Specialization::all();
+
+        return view('lecturers.create', compact('specializations'));
     }
 
 
@@ -28,8 +34,9 @@ class LecturerController extends Controller
         $request->validate([
             'code' => 'required|unique:lecturers,code',
             'name' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:lecturers,email',
             'phone' => 'nullable',
+            'specialization_id' => 'required|exists:specializations,id',
         ]);
 
         Lecturer::create([
@@ -37,6 +44,7 @@ class LecturerController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
+            'specialization_id' => $request->specialization_id,
         ]);
 
         return redirect()

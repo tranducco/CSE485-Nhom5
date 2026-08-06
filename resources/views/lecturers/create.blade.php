@@ -43,6 +43,29 @@
 
         <br>
 
+        <!-- Thêm chuyên ngành -->
+        <div>
+            <label>Chuyên ngành</label>
+            <br>
+
+            <select name="specialization_id" required>
+                <option value="">
+                    -- Chọn chuyên ngành --
+                </option>
+
+                @foreach($specializations as $specialization)
+
+                    <option value="{{ $specialization->id }}">
+                        {{ $specialization->name }}
+                    </option>
+
+                @endforeach
+
+            </select>
+        </div>
+
+        <br>
+
         <button type="submit"
             style="
                 background:#2563eb;

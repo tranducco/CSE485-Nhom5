@@ -13,14 +13,16 @@ class LecturerSeeder extends Seeder
             'code' => 'GV001',
             'name' => 'Nguyen Van An',
             'email' => 'an@tlu.edu.vn',
-            'phone' => '0901234567'
+            'phone' => '0901234567',
+            'specialization_id' => 1
         ]);
 
         Lecturer::create([
             'code' => 'GV002',
             'name' => 'Tran Thi Binh',
             'email' => 'binh@tlu.edu.vn',
-            'phone' => '0912345678'
+            'phone' => '0912345678',
+            'specialization_id' => 2
         ]);
     }
 }

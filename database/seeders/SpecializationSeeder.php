@@ -14,33 +14,29 @@ class SpecializationSeeder extends Seeder
         DB::table('specializations')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
-        $majors = [
-            [
-                'code' => 'HTTT',
-                'name' => 'Hệ thống thông tin',
-            ],
+        $specializations = [
             [
                 'code' => 'KTPM',
                 'name' => 'Kỹ thuật phần mềm',
+            ],
+            [
+                'code' => 'HTTT',
+                'name' => 'Hệ thống thông tin',
             ],
             [
                 'code' => 'KHMT',
                 'name' => 'Khoa học máy tính',
             ],
             [
-                'code' => 'ANM',
-                'name' => 'An ninh mạng',
-            ],
-            [
                 'code' => 'AI',
                 'name' => 'Trí tuệ nhân tạo',
             ],
             [
-                'code' => 'IOT',
-                'name' => 'Internet vạn vật (IoT)',
+                'code' => 'ANM',
+                'name' => 'An ninh mạng',
             ],
         ];
 
-        Specialization::insert($majors);
+        Specialization::insert($specializations);
     }
 }

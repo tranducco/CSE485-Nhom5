@@ -16,6 +16,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone')->nullable();
 
+            // thêm chuyên ngành
+            $table->foreignId('specialization_id')
+                  ->constrained('specializations')
+                  ->cascadeOnDelete();
+
             $table->timestamps();
         });
     }
