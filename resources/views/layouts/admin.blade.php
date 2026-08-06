@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Quản lý Đồ án')</title>
-
     <style>
         *{
             margin:0;
@@ -21,7 +20,6 @@
             display:flex;
             min-height:100vh;
         }
-
         .sidebar{
             width:240px;
             background:#1f2937;
@@ -122,20 +120,22 @@
         </a>
 
 
-        <!-- Chưa có route sinh viên nên để tạm -->
-        <a href="#">
+        <!--Module của Cơ-->
+        <a class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}"
+            href="{{ route('admin.students.index') }}">
             Quản lý Sinh viên
         </a>
 
 
-        <!-- Module của bạn -->
+        <!-- Module của Đạt -->
         <a class="{{ request()->is('lecturers*') ? 'active' : '' }}"
-           href="{{ url('/lecturers') }}">
+            href="{{ url('/lecturers') }}">
             Quản lý Giảng viên
         </a>
 
-
-        <a href="#">
+        <!-- Module của Việt-->
+        <a class="{{ request()->is('topics*') ? 'active' : '' }}"
+            href="{{ url('/topics') }}">
             Quản lý Đề tài
         </a>
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TopicAssignment extends Model
 {
@@ -12,7 +13,7 @@ class TopicAssignment extends Model
         'assigned_date'
     ];
 
-    public function lecturer()
+    public function lecturer(): BelongsTo
     {
         return $this->belongsTo(Lecturer::class);
     }
@@ -20,5 +21,10 @@ class TopicAssignment extends Model
     public function evaluationScore()
     {
         return $this->hasOne(EvaluationScore::class);
+    }
+
+    public function topic(): BelongsTo
+    {
+        return $this->belongsTo(Topic::class);
     }
 }

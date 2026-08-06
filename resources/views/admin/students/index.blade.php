@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 
 @section('content')
+    <a href="{{ route('admin.students.create') }}" class="btn">+ Thêm sinh viên mới</a>
+    <h2>Danh sách sinh viên</h2>
     <table border="1" cellpadding="10">
         <tr>
             <th>Mã SV</th>

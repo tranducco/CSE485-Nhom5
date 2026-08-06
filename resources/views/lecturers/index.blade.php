@@ -6,6 +6,20 @@
 
 <div class="card">
 
+    <div style="margin-bottom:15px;">
+        <a href="{{ route('lecturers.create') }}"
+           style="
+                display:inline-block;
+                padding:10px 18px;
+                background:#007bff;
+                color:white;
+                text-decoration:none;
+                border-radius:5px;
+           ">
+            + Thêm giảng viên
+        </a>
+    </div>
+
     <h2>Danh sách giảng viên</h2>
 
 
