@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản lý Giảng viên')
+@section('title', 'Quản lý Chuyên môn')
 
 @section('content')
 
@@ -18,61 +18,61 @@
         </div>
     @endif
 
-    <a href="{{ route('lecturers.create') }}" class="btn btn-add">
-        + Thêm giảng viên
+    <a
+        href="{{ route('specializations.create') }}"
+        class="btn btn-add"
+    >
+        + Thêm chuyên môn
     </a>
 
-    <h2>Danh sách giảng viên</h2>
+    <h2>Danh sách chuyên môn</h2>
 
     <table>
 
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Mã GV</th>
-                <th>Họ tên</th>
-                <th>Email</th>
-                <th>Số điện thoại</th>
-                <th>Chuyên môn</th>
+                <th>Mã</th>
+                <th>Tên chuyên môn</th>
+                <th>Số giảng viên</th>
+                <th>Số sinh viên</th>
                 <th>Thao tác</th>
             </tr>
         </thead>
 
         <tbody>
 
-        @forelse($lecturers as $lecturer)
+        @forelse($specializations as $specialization)
 
             <tr>
 
-                <td>{{ $lecturer->id }}</td>
+                <td>{{ $specialization->id }}</td>
 
-                <td>{{ $lecturer->code }}</td>
+                <td>{{ $specialization->code }}</td>
 
-                <td>{{ $lecturer->name }}</td>
+                <td>{{ $specialization->name }}</td>
 
-                <td>{{ $lecturer->email }}</td>
+                <td>{{ $specialization->lecturers_count }}</td>
 
-                <td>{{ $lecturer->phone }}</td>
-
-                <td>
-                    {{ $lecturer->specialization->name ?? 'Chưa có' }}
-                </td>
+                <td>{{ $specialization->students_count }}</td>
 
                 <td>
+
                     <div class="actions">
 
                         <a
-                            href="{{ route('lecturers.edit', $lecturer) }}"
+                            href="{{ route('specializations.edit', $specialization) }}"
                             class="btn-edit"
                         >
                             Sửa
                         </a>
 
                         <form
-                            action="{{ route('lecturers.destroy', $lecturer) }}"
+                            action="{{ route('specializations.destroy', $specialization) }}"
                             method="POST"
-                            onsubmit="return confirm('Bạn có chắc muốn xóa giảng viên này?');"
+                            onsubmit="return confirm('Bạn có chắc muốn xóa chuyên môn này?');"
                         >
+
                             @csrf
                             @method('DELETE')
 
@@ -82,9 +82,11 @@
                             >
                                 Xóa
                             </button>
+
                         </form>
 
                     </div>
+
                 </td>
 
             </tr>
@@ -92,8 +94,8 @@
         @empty
 
             <tr>
-                <td colspan="7" style="text-align:center;">
-                    Chưa có giảng viên.
+                <td colspan="6" style="text-align:center;">
+                    Chưa có chuyên môn.
                 </td>
             </tr>
 

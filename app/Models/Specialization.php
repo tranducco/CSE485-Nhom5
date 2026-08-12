@@ -9,11 +9,15 @@ class Specialization extends Model
     protected $fillable = [
         'code',
         'name',
-        'description'
     ];
 
     public function lecturers()
     {
         return $this->hasMany(Lecturer::class);
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
     }
 }

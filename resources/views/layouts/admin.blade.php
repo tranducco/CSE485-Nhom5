@@ -1,101 +1,266 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@yield('title', 'Quản lý Đồ án')</title>
+
+    <title>
+        @yield('title', 'Quản lý Đồ án')
+    </title>
+
     <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-            font-family:Segoe UI;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", sans-serif;
         }
 
-        body{
-            background:#f5f5f5;
+        body {
+            background: #f5f6fa;
+            color: #1f2937;
         }
 
-        .wrapper{
-            display:flex;
-            min-height:100vh;
-        }
-        .sidebar{
-            width:240px;
-            background:#1f2937;
-            color:white;
-            padding:20px;
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
         }
 
-        .sidebar h2{
-            margin-bottom:25px;
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            width: 250px;
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            flex-shrink: 0;
         }
 
-        .sidebar a{
-            display:block;
-            color:white;
-            text-decoration:none;
-            padding:10px;
-            margin-bottom:5px;
-            border-radius:6px;
+        .sidebar h2 {
+            margin-bottom: 25px;
+            font-size: 22px;
         }
 
-        .sidebar a.active{
-            background:#2563eb;
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px 12px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            transition: 0.2s;
         }
 
-        .sidebar a:hover{
-            background:#374151;
+        .sidebar a.active {
+            background: #2563eb;
         }
 
-        .content{
-            flex:1;
+        .sidebar a:hover {
+            background: #374151;
         }
 
-        .topbar{
-            background:white;
-            padding:20px;
-            border-bottom:1px solid #ddd;
-            font-size:22px;
-            font-weight:bold;
+        .menu-title {
+            color: #9ca3af;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            padding-left: 10px;
+            letter-spacing: 0.5px;
         }
 
-        .main{
-            padding:25px;
+        /* ================= CONTENT ================= */
+
+        .content {
+            flex: 1;
+            min-width: 0;
         }
 
-        .card{
-            background:white;
-            padding:20px;
-            border-radius:8px;
-            margin-bottom:20px;
+        .topbar {
+            background: white;
+            padding: 20px 25px;
+            border-bottom: 1px solid #ddd;
+            font-size: 22px;
+            font-weight: bold;
         }
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-            margin-top:20px;
+        .main {
+            padding: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* ================= TABLE ================= */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
         }
 
         table th,
-        table td{
-            border:1px solid #ddd;
-            padding:10px;
-            text-align:left;
+        table td {
+            border: 1px solid #e5e7eb;
+            padding: 11px 10px;
+            text-align: left;
         }
 
-        table th{
-            background:#f3f4f6;
+        table th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #111827;
         }
 
-        .btn{
-            display:inline-block;
-            padding:8px 15px;
-            background:#2563eb;
-            color:white;
-            text-decoration:none;
-            border-radius:5px;
-            margin-bottom:15px;
+        table tr:hover td {
+            background: #f9fafb;
+        }
+
+        /* ================= BUTTON ================= */
+
+        .btn {
+            display: inline-block;
+            padding: 9px 15px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-add {
+            background: #2563eb;
+        }
+
+        .btn-edit {
+            display: inline-block;
+            background: #f59e0b;
+            color: white;
+            padding: 7px 11px;
+            border-radius: 5px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-edit:hover {
+            background: #d97706;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+            padding: 7px 11px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-delete:hover {
+            background: #b91c1c;
+        }
+
+        .btn-score {
+            display: inline-block;
+            background: #16a34a;
+            color: white;
+            padding: 7px 11px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn-score:hover {
+            background: #15803d;
+        }
+
+        .btn-view {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            padding: 7px 11px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* ================= ACTION ================= */
+
+        .actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* ================= MESSAGE ================= */
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+
+        /* ================= FORM ================= */
+
+        input,
+        select,
+        textarea {
+            padding: 9px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 500px;
+            margin-top: 5px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .back-link {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
         }
 
     </style>
@@ -107,68 +272,94 @@
 
 <div class="wrapper">
 
-
     <!-- SIDEBAR -->
 
     <div class="sidebar">
 
         <h2>QL Đồ Án</h2>
 
-
         <a href="#">
-            Dashboard
+            🏠 Dashboard
         </a>
 
+        <!-- SINH VIÊN -->
 
-        <!--Module của Cơ-->
-        <a class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}"
-            href="{{ route('admin.students.index') }}">
-            Quản lý Sinh viên
+        <div class="menu-title">
+            SINH VIÊN
+        </div>
+
+        <a
+            class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}"
+            href="{{ route('admin.students.index') }}"
+        >
+            👨‍🎓 Quản lý Sinh viên
         </a>
 
+        <!-- MODULE CỦA BẠN -->
 
-        <!-- Module của Đạt -->
-        <a class="{{ request()->is('lecturers*') ? 'active' : '' }}"
-            href="{{ url('/lecturers') }}">
-            Quản lý Giảng viên
+        <div class="menu-title">
+            GIẢNG VIÊN & PHÂN CÔNG
+        </div>
+
+        <a
+            class="{{ request()->routeIs('lecturers.*') ? 'active' : '' }}"
+            href="{{ route('lecturers.index') }}"
+        >
+            👨‍🏫 Giảng viên
         </a>
 
-        <!-- Module của Việt-->
-        <a class="{{ request()->is('topics*') ? 'active' : '' }}"
-            href="{{ url('/topics') }}">
-            Quản lý Đề tài
+        <a
+            class="{{ request()->routeIs('specializations.*') ? 'active' : '' }}"
+            href="{{ route('specializations.index') }}"
+        >
+            📚 Chuyên môn
         </a>
 
+        <a
+            class="{{ request()->routeIs('topic-assignments.*') ? 'active' : '' }}"
+            href="{{ route('topic-assignments.index') }}"
+        >
+            📋 Phân công hướng dẫn
+        </a>
+
+        <a
+            class="{{ request()->routeIs('evaluation-scores.*') ? 'active' : '' }}"
+            href="{{ route('evaluation-scores.index') }}"
+        >
+            ⭐ Điểm đánh giá
+        </a>
+
+        <!-- ĐỀ TÀI -->
+
+        <div class="menu-title">
+            ĐỀ TÀI & TIẾN ĐỘ
+        </div>
+
+        <a
+            class="{{ request()->routeIs('topics.*') ? 'active' : '' }}"
+            href="{{ route('topics.index') }}"
+        >
+            📌 Quản lý Đề tài
+        </a>
 
     </div>
-
 
 
     <!-- CONTENT -->
 
     <div class="content">
 
-
         <div class="topbar">
-
             @yield('title', 'Quản lý Đồ án')
-
         </div>
-
-
 
         <div class="main">
-
             @yield('content')
-
         </div>
-
 
     </div>
 
-
 </div>
-
 
 </body>
 </html>

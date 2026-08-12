@@ -13,6 +13,12 @@ class DatabaseSeeder extends Seeder
             StudentSeeder::class,
             LecturerSeeder::class,
             TopicSeeder::class,
+
+            // Phải chạy sau Lecturer + Topic
+            TopicAssignmentSeeder::class,
+
+            // Phải chạy sau TopicAssignment
+            EvaluationScoreSeeder::class,
         ]);
     }
 }
