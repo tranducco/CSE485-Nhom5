@@ -20,6 +20,17 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// ==========================================
+// 1. KHU VỰC ADMIN (Gom nhóm prefix)
+// ==========================================
+Route::prefix('admin')->name('admin.')->group(function () {
+    
+    // STUDENTS (Sẽ tự động thành URL: /admin/students và Tên route: admin.students.index)
+    Route::get('/students', [StudentController::class, 'index'])->name('students.index');
+    Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
+    Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+    
+});
 
 // =====================================================
 // STUDENTS - MODULE CỦA CƠ
