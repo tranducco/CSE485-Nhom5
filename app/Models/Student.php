@@ -18,4 +18,8 @@ class Student extends Model
     {
         return $this->belongsTo(Specialization::class);
     }
+    public function topicRegistrations()
+    {
+        return $this->hasMany(TopicRegistration::class);
+    }
 }

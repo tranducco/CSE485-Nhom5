@@ -22,4 +22,9 @@ class Topic extends Model
     {
         return $this->hasMany(TopicAssignment::class);
     }
+    // Bổ sung thêm quan hệ với TopicRegistration của Cơ
+    public function topicRegistrations()
+    {
+        return $this->hasMany(TopicRegistration::class);
+    }
 }
