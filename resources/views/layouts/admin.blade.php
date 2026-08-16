@@ -344,6 +344,25 @@
         >
             📌 Quản lý Đề tài
         </a>
+             <a
+            class="{{ request()->routeIs('milestones.*') ? 'active' : '' }}"
+            href="{{ route('milestones.index') }}"
+        >
+            📅 Quản lý mốc thực hiện
+        </a>
+        <a
+            class="{{ request()->routeIs('milestone-submissions.*') ? 'active' : '' }}"
+            href="{{ route('milestone-submissions.index') }}"
+        >
+        📄 Bài nộp milestone
+        </a>
+        <a
+            class="{{ request()->routeIs('evaluation-criterias.*') ? 'active' : '' }}"
+            href="{{ route('evaluation-criterias.index') }}"
+        >
+        📊 Tiêu chí đánh giá
+        </a>
+        
 
     </div>
 

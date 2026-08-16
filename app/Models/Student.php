@@ -21,5 +21,11 @@ class Student extends Model
     public function topicRegistrations()
     {
         return $this->hasMany(TopicRegistration::class);
+    }/**
+ * Một sinh viên có nhiều bài nộp mốc thực hiện.
+ */
+    public function milestoneSubmissions()
+    {
+        return $this->hasMany(MilestoneSubmission::class);
     }
 }

@@ -1,20 +1,18 @@
 @extends('layouts.admin')
 
-@section('title', 'Thêm đề tài')
+@section('title', 'Sửa đề tài')
 
 @section('content')
 
 <div class="card">
 
-    <h2>Thêm đề tài</h2>
+    <h2>Sửa đề tài</h2>
 
     <br>
 
     @if ($errors->any())
         <div style="background:#fee2e2;color:#991b1b;padding:12px;margin-bottom:15px;border-radius:5px;">
-            <strong>Vui lòng kiểm tra lại:</strong>
-
-            <ul style="margin:8px 0 0 20px;">
+            <ul style="margin:0 0 0 20px;">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -22,8 +20,13 @@
         </div>
     @endif
 
-    <form action="{{ route('topics.store') }}" method="POST">
+    <form
+        action="{{ route('topics.update', $topic) }}"
+        method="POST"
+    >
+
         @csrf
+        @method('PUT')
 
         <p>
             <label>Mã đề tài</label><br>
@@ -31,7 +34,7 @@
             <input
                 type="text"
                 name="code"
-                value="{{ old('code') }}"
+                value="{{ old('code', $topic->code) }}"
                 maxlength="20"
                 style="width:100%;padding:8px;"
                 required
@@ -46,7 +49,7 @@
             <input
                 type="text"
                 name="title"
-                value="{{ old('title') }}"
+                value="{{ old('title', $topic->title) }}"
                 maxlength="255"
                 style="width:100%;padding:8px;"
                 required
@@ -63,7 +66,7 @@
                 rows="5"
                 maxlength="5000"
                 style="width:100%;padding:8px;"
-            >{{ old('description') }}</textarea>
+            >{{ old('description', $topic->description) }}</textarea>
         </p>
 
         <br>
@@ -74,7 +77,7 @@
             <input
                 type="number"
                 name="max_students"
-                value="{{ old('max_students', 1) }}"
+                value="{{ old('max_students', $topic->max_students) }}"
                 min="1"
                 max="100"
                 style="padding:8px;"
@@ -94,14 +97,14 @@
             >
                 <option
                     value="Open"
-                    {{ old('status', 'Open') === 'Open' ? 'selected' : '' }}
+                    {{ old('status', $topic->status) === 'Open' ? 'selected' : '' }}
                 >
                     Đang mở
                 </option>
 
                 <option
                     value="Closed"
-                    {{ old('status') === 'Closed' ? 'selected' : '' }}
+                    {{ old('status', $topic->status) === 'Closed' ? 'selected' : '' }}
                 >
                     Đã đóng
                 </option>
@@ -111,11 +114,14 @@
         <br>
 
         <button type="submit" class="btn">
-            Lưu đề tài
+            Cập nhật
         </button>
 
-        <a href="{{ route('topics.index') }}" class="btn"
-           style="background:#6b7280;">
+        <a
+            href="{{ route('topics.index') }}"
+            class="btn"
+            style="background:#6b7280;"
+        >
             Quay lại
         </a>
 

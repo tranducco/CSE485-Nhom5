@@ -10,6 +10,9 @@ use App\Http\Controllers\EvaluationScoreController;
 use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\TopicRegistrationController;
 use App\Http\Controllers\Student\TopicController as StudentTopicController;
+use App\Http\Controllers\MilestoneController;
+use App\Http\Controllers\MilestoneSubmissionController;
+use App\Http\Controllers\EvaluationCriteriaController;
 
 
 // =====================================================
@@ -20,17 +23,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
 // ==========================================
 // 1. KHU VỰC ADMIN (Gom nhóm prefix)
 // ==========================================
 Route::prefix('admin')->name('admin.')->group(function () {
-    
+
     // STUDENTS (Sẽ tự động thành URL: /admin/students và Tên route: admin.students.index)
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
     Route::post('/students', [StudentController::class, 'store'])->name('students.store');
-    
+
 });
+
 
 // =====================================================
 // STUDENTS - MODULE CỦA CƠ
@@ -82,8 +87,7 @@ Route::delete('/topic-registrations/{id}', [TopicRegistrationController::class, 
 
 
 // =====================================================
-// KHU VỰC SINH VIÊN - CLIENT SITE
-// =====================================================
+// KHU VỰC SINH VIÊN - CLIENT SITE// =====================================================
 
 Route::prefix('student')->name('student.')->group(function () {
 
@@ -142,14 +146,22 @@ Route::post('/evaluation-scores/{topicAssignment}', [EvaluationScoreController::
 // TOPICS - MODULE CỦA VIỆT
 // =====================================================
 
-// Danh sách đề tài
-Route::get('/topics', [TopicController::class, 'index'])
-    ->name('topics.index');
+// CRUD đề tài
+Route::resource('topics', TopicController::class);
+// =====================================================
+// MILESTONES - MODULE QUẢN LÝ TIẾN ĐỘ
+// =====================================================
 
-// Form thêm đề tài
-Route::get('/topics/create', [TopicController::class, 'create'])
-    ->name('topics.create');
+Route::resource('milestones', MilestoneController::class);
+// =====================================================
+// MILESTONE SUBMISSIONS
+// =====================================================
 
-// Lưu đề tài
-Route::post('/topics', [TopicController::class, 'store'])
-    ->name('topics.store');
+Route::resource(
+    'milestone-submissions',
+    MilestoneSubmissionController::class
+);
+Route::resource(
+    'evaluation-criterias',
+    EvaluationCriteriaController::class
+);
