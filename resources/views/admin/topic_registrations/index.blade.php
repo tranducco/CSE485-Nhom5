@@ -19,7 +19,7 @@
     <div class="card">
         <div class="card-body">
             <table class="table table-bordered table-hover">
-                <thead class="table-dark">
+                <thead class="table-secondary">
                     <tr>
                         <th>ID Đơn</th>
                         <th>Sinh viên</th>
@@ -49,20 +49,21 @@
                         <!-- Cột: Xét duyệt & Ghi chú -->
                         <td>
                             @php
-                                // Logic khóa Form nếu Đề tài đã được phân công và có điểm
-                                $isGraded = \Illuminate\Support\Facades\DB::table('evaluation_scores')
-                                    ->join('topic_assignments', 'evaluation_scores.topic_assignment_id', '=', 'topic_assignments.id')
-                                    ->where('topic_assignments.topic_id', $reg->topic_id)
-                                    ->exists();
+                                $hasScore = false;
+                                // Chỉ kiểm tra điểm nếu đơn đã được duyệt
+                                if ($reg->status == 'Đã duyệt') {
+                                    $assignment = \App\Models\TopicAssignment::where('topic_id', $reg->topic_id)->first();
+                                    if ($assignment) {
+                                        $hasScore = \App\Models\EvaluationScore::where('topic_assignment_id', $assignment->id)->exists();
+                                    }
+                                }
                             @endphp
 
-                            @if($isGraded)
-                                <!-- Nếu đã có điểm thì khóa lại, ẩn Form đi -->
-                                <div class="mb-2">
-                                    <span class="badge bg-secondary p-2">🔒 Đã có điểm (Khóa)</span>
-                                </div>
+                            @if($hasScore)
+                                <!-- KHÓA FORM: Nếu đã có điểm, chỉ hiện nhãn -->
+                                <span class="badge bg-secondary mb-2" style="font-size: 13px; padding: 7px;">🔒 Đã có điểm (Khóa)</span>
                             @else
-                                <!-- Nếu chưa có điểm, hiện Form đổi trạng thái -->
+                                <!-- MỞ FORM: Nếu chưa có điểm, hiện Form đổi trạng thái -->
                                 <form action="{{ route('admin.topic_registrations.update_status', $reg->id) }}" method="POST" style="display: flex; gap: 10px; margin-bottom: 8px;">
                                     @csrf
                                     @method('PUT')
@@ -79,8 +80,8 @@
                                 </form>
                             @endif
                             
-                            <!-- BẮT ĐẦU CHỖ VỪA ĐƯỢC CHÈN THÊM -->
-                            <div class="d-flex gap-2">
+                            <!-- BẮT ĐẦU CHỖ VỪA ĐƯỢC CHÈN THÊM (Luôn hiển thị) -->
+                            <div class="d-flex gap-2 mt-2">
                                 <!-- Nút gọi Modal Lịch sử (Chuẩn Bootstrap 5) -->
                                 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#logModal-{{ $reg->id }}">
                                     🔍 Xem lịch sử

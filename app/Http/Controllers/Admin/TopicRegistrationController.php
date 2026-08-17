@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller; 
 use App\Models\TopicRegistration;
 use App\Models\StatusLog;
-use App\Models\Topic; // Đã thêm import Topic vào đây để không bị lỗi
+use App\Models\Topic; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,9 +12,7 @@ class TopicRegistrationController extends Controller
 {   
     public function index()
     {
-        // Thêm 'statusLogs' vào hàm with()
         $registrations = TopicRegistration::with(['student', 'topic', 'statusLogs'])->orderBy('created_at', 'desc')->get();
-        
         return view('admin.topic_registrations.index', compact('registrations'));
     }
 
@@ -27,28 +25,34 @@ class TopicRegistrationController extends Controller
 
         $oldStatus = $registration->status;
         $newStatus = $request->status;
+        
+        $topic = Topic::find($registration->topic_id);
 
-        // --- BẮT ĐẦU CHÈN LOGIC KIỂM TRA SỐ LƯỢNG Ở ĐÂY ---
-        // Nếu cậu (Admin) định duyệt đơn này, hệ thống sẽ phải đếm trước
-        if ($newStatus === 'Đã duyệt' && $oldStatus !== 'Đã duyệt') {
-            // Đếm số lượng đơn của đề tài này đã được duyệt trước đó
-            $approvedCount = TopicRegistration::where('topic_id', $registration->topic_id)
-                                              ->where('status', 'Đã duyệt')
-                                              ->count();
+        // --- BƯỚC 1: CHẶN DUYỆT LỐ ---
+        if ($topic && $newStatus === 'Đã duyệt' && $oldStatus !== 'Đã duyệt') {
+            $approvedCount = TopicRegistration::where('topic_id', $topic->id)
+                                                ->where('status', 'Đã duyệt')
+                                                ->count();
             
-            // Lấy thông tin đề tài để biết giới hạn (max_students)
-            $topic = Topic::find($registration->topic_id);
-
-            // Kiểm tra giới hạn: Nếu số đơn đã duyệt bằng hoặc lớn hơn số lượng cho phép thì chặn ngay
-            if ($topic && $approvedCount >= $topic->max_students) {
-                return back()->with('error', 'Lỗi Nghiệp Vụ: Đề tài "' . $topic->title . '" đã đạt giới hạn tối đa (' . $topic->max_students . ' sinh viên). KHÔNG THỂ DUYỆT THÊM!');
+            if ($approvedCount >= $topic->max_students) {
+                return back()->with('error', 'Lỗi Nghiệp Vụ: Đề tài "' . ($topic->name ?? $topic->id) . '" đã đạt giới hạn tối đa (' . $topic->max_students . ' sinh viên). KHÔNG THỂ DUYỆT THÊM!');
             }
         }
-        // --- KẾT THÚC LOGIC KIỂM TRA ---
 
-        // Chỉ ghi log nếu trạng thái thực sự bị thay đổi
+        // --- BƯỚC 2: CHẶN THAY ĐỔI NẾU ĐÃ CÓ ĐIỂM (Khóa tuyệt đối) ---
+        $assignment = \App\Models\TopicAssignment::where('topic_id', $registration->topic_id)->first();
+        if ($assignment) {
+            $hasScore = \App\Models\EvaluationScore::where('topic_assignment_id', $assignment->id)->exists();
+            
+            // Nếu đã có điểm, CHẶN TẤT CẢ mọi thao tác bấm Lưu (dù là đổi trạng thái hay đổi ghi chú)
+            if ($hasScore) {
+                return back()->with('error', 'Lỗi: Đề tài này đã được chấm điểm. Hồ sơ đã bị khóa cứng và không thể chỉnh sửa!');
+            }
+        }
+
+        // --- BƯỚC 3: CẬP NHẬT TRẠNG THÁI VÀ XỬ LÝ LOGIC ĐÓNG/MỞ ĐỀ TÀI ---
         if ($oldStatus !== $newStatus) {
-            DB::transaction(function () use ($registration, $oldStatus, $newStatus, $request) {
+            DB::transaction(function () use ($registration, $oldStatus, $newStatus, $request, $topic) {
                 
                 // 1. Cập nhật trạng thái mới cho đơn
                 $registration->update(['status' => $newStatus]);
@@ -61,10 +65,24 @@ class TopicRegistrationController extends Controller
                     'note' => $request->note
                 ]);
                 
+                // 3. TỰ ĐỘNG ĐÓNG HOẶC MỞ LẠI ĐỀ TÀI
+                if ($topic) {
+                    $currentApproved = TopicRegistration::where('topic_id', $topic->id)
+                                                        ->where('status', 'Đã duyệt')
+                                                        ->count();
+                    
+                    // Sửa lỗi SQL Data truncated: Sử dụng 'Closed' và 'Open'
+                    if ($currentApproved >= $topic->max_students && $topic->status !== 'Closed') {
+                        $topic->update(['status' => 'Closed']);
+                    } 
+                    elseif ($currentApproved < $topic->max_students && $topic->status === 'Closed') {
+                        $topic->update(['status' => 'Open']);
+                    }
+                }
             });
         }
 
-        return redirect()->back()->with('success', 'Đã cập nhật trạng thái đề tài và lưu log thành công!');
+        return redirect()->back()->with('success', 'Đã cập nhật trạng thái đơn và kiểm tra giới hạn đề tài thành công!');
     }
     
     // Xóa đơn đăng ký
@@ -72,10 +90,7 @@ class TopicRegistrationController extends Controller
     {
         $registration = TopicRegistration::findOrFail($id);
 
-        // Xóa tất cả lịch sử log liên quan trước để tránh lỗi khóa ngoại (Foreign Key Constraint) trong Database
         \App\Models\StatusLog::where('topic_registration_id', $id)->delete();
-        
-        // Sau đó mới xóa đơn đăng ký
         $registration->delete();
 
         return back()->with('success', 'Đã xóa đơn đăng ký và lịch sử liên quan thành công!');

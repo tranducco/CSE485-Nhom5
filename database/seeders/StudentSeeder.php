@@ -20,20 +20,19 @@ class StudentSeeder extends Seeder
             return;
         }
 
-        // 2. Tạo User 1 (Admin) - Dùng firstOrCreate để chạy nhiều lần không bị lỗi trùng lặp
+        // 2. Tạo User 1 (Admin) - Đổi mật khẩu thành 123456
         User::firstOrCreate(
-            ['email' => 'admin@tlu.edu.vn'], // Kiểm tra xem email này có chưa
+            ['email' => 'admin@tlu.edu.vn'],
             [
                 'name' => 'Trần Đức Cơ (Admin)',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('123456'), // Đã đổi thành 123456
                 'role' => 'admin',
             ]
         );
-
         // 3. Chuẩn bị mảng 3 sinh viên demo
         $studentsData = [
             [
-                'name' => 'Trần Đức Cơ',
+                'name' => 'Trần Đức Việt',
                 'email' => 'cotd@student.tlu.edu.vn',
                 'student_code' => '2251160001',
                 'class_name' => '62HTTT1'
@@ -52,25 +51,25 @@ class StudentSeeder extends Seeder
             ]
         ];
 
-        // 4. Vòng lặp tự động tạo User và Student
-        foreach ($studentsData as $data) {
-            // Tạo tài khoản User cho sinh viên
-            $userStudent = User::firstOrCreate(
-                ['email' => $data['email']],
+        // 4. Lặp mảng để tạo User và Student đồng thời
+        foreach ($studentsData as $st) {
+            // Bước A: Tạo tài khoản User trước với role 'student' và pass '123456'
+            $user = User::firstOrCreate(
+                ['email' => $st['email']],
                 [
-                    'name' => $data['name'],
-                    'password' => Hash::make('password'),
-                    'role' => 'student',
+                    'name' => $st['name'],
+                    'password' => Hash::make('123456'), // Mật khẩu chung 123456
+                    'role' => 'student', // Set cứng role là student
                 ]
             );
 
-            // Tạo hồ sơ Student tương ứng nối với User và Chuyên ngành
-            Student::firstOrCreate(
-                ['student_code' => $data['student_code']],
+            // Bước B: Tạo thông tin Sinh viên gắn với User vừa tạo
+            \App\Models\Student::firstOrCreate(
+                ['student_code' => $st['student_code']],
                 [
-                    'user_id' => $userStudent->id,
-                    'specialization_id' => $spec->id,
-                    'class_name' => $data['class_name'],
+                    'user_id' => $user->id,
+                    'class_name' => $st['class_name'],
+                    'specialization_id' => $spec->id ?? 1 // Giữ nguyên logic lấy ID chuyên ngành cũ của cậu
                 ]
             );
         }

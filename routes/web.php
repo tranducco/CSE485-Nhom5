@@ -1,167 +1,109 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
+// Các Controller của nhóm Admin
+use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\TopicRegistrationController;
 use App\Http\Controllers\LecturerController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\SpecializationController;
 use App\Http\Controllers\TopicAssignmentController;
 use App\Http\Controllers\EvaluationScoreController;
-use App\Http\Controllers\Admin\StudentController;
-use App\Http\Controllers\Admin\TopicRegistrationController;
-use App\Http\Controllers\Student\TopicController as StudentTopicController;
 use App\Http\Controllers\MilestoneController;
 use App\Http\Controllers\MilestoneSubmissionController;
 use App\Http\Controllers\EvaluationCriteriaController;
 
+// Các Controller của nhóm Student
+use App\Http\Controllers\Student\TopicController as StudentTopicController;
 
-// =====================================================
-// TRANG CHỦ
-// =====================================================
+// TRANG CHỦ (TỰ ĐỘNG ĐIỀU HƯỚNG)
 
 Route::get('/', function () {
-    return view('welcome');
+    // Nếu đã đăng nhập, tự động đẩy về đúng trang theo Role
+    if (\Illuminate\Support\Facades\Auth::check()) {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        
+        if ($user->role === 'student') {
+            return redirect()->route('student.dashboard'); 
+        } elseif ($user->role === 'admin') {
+            return redirect('/admin/students');
+        } elseif ($user->role === 'lecturer') {
+            return redirect('/evaluation-scores');
+        }
+    }
+    // Nếu chưa đăng nhập, văng thẳng ra form Login
+    return redirect()->route('login');
+})->name('home');
+
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+
+// KHU VỰC RIÊNG TƯ (BẮT BUỘC ĐĂNG NHẬP & KIỂM TRA ROLE)
+
+Route::middleware('auth')->group(function () {
+    
+    // Nút Đăng xuất (Ai đã vào đây thì đều có quyền bấm)
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // PHÒNG 1: CHỈ DÀNH CHO ADMIN
+    
+    Route::middleware('role:admin')->group(function () {
+        
+        // Module Students (Của Cơ)
+        Route::prefix('admin/students')->name('admin.students.')->group(function () {
+            Route::get('/', [StudentController::class, 'index'])->name('index');
+            Route::get('/create', [StudentController::class, 'create'])->name('create');
+            Route::post('/', [StudentController::class, 'store'])->name('store');
+            Route::get('/{student}/edit', [StudentController::class, 'edit'])->name('edit');
+            Route::put('/{student}', [StudentController::class, 'update'])->name('update');
+            Route::delete('/{student}', [StudentController::class, 'destroy'])->name('destroy');
+        });
+
+        // Module Topic Registrations (Của Cơ)
+        Route::prefix('topic-registrations')->name('admin.topic_registrations.')->group(function () {
+            Route::get('/', [TopicRegistrationController::class, 'index'])->name('index');
+            Route::put('/{registration}/status', [TopicRegistrationController::class, 'updateStatus'])->name('update_status');
+            Route::delete('/{id}', [TopicRegistrationController::class, 'destroy'])->name('destroy');
+        });
+
+        // Các Module quản lý khác (Chỉ Admin được sửa/xóa/thêm)
+        Route::resource('lecturers', LecturerController::class)->except(['show']);
+        Route::resource('specializations', SpecializationController::class)->except(['show']);
+        Route::resource('topic-assignments', TopicAssignmentController::class)->except(['show']);
+        Route::resource('topics', TopicController::class);
+        Route::resource('milestones', MilestoneController::class);
+        Route::resource('milestone-submissions', MilestoneSubmissionController::class);
+        Route::resource('evaluation-criterias', EvaluationCriteriaController::class);
+    });
+
+    // -------------------------------------------------
+    // PHÒNG 2: CHỈ DÀNH CHO GIẢNG VIÊN
+    // -------------------------------------------------
+    Route::middleware('role:lecturer')->group(function () {
+        // Giảng viên chỉ được xem và nhập điểm
+        Route::get('/evaluation-scores', [EvaluationScoreController::class, 'index'])->name('evaluation-scores.index');
+        Route::get('/evaluation-scores/create/{topicAssignment}', [EvaluationScoreController::class, 'create'])->name('evaluation-scores.create');
+        Route::post('/evaluation-scores/{topicAssignment}', [EvaluationScoreController::class, 'store'])->name('evaluation-scores.store');
+        // Bổ sung: Cho phép Giảng viên xem Tiến độ và Bài nộp (Của Việt)
+        Route::resource('milestones', MilestoneController::class);
+        Route::resource('milestone-submissions', MilestoneSubmissionController::class);
+    });
+
+    // -------------------------------------------------
+    // PHÒNG 3: CHỈ DÀNH CHO SINH VIÊN
+    // -------------------------------------------------
+    Route::middleware('role:student')->prefix('student')->name('student.')->group(function () {
+        
+        // Trang thông tin tổng quan (Dashboard Sinh viên) - Vừa thêm!
+        Route::get('/dashboard', [StudentTopicController::class, 'dashboard'])->name('dashboard');
+        // Route xử lý việc nộp bài cho một mốc cụ thể
+    Route::post('/milestones/{milestone}/submit', [StudentMilestoneController::class, 'submit'])->name('milestones.submit');
+        // Đăng ký đề tài
+        Route::get('/topics', [StudentTopicController::class, 'index'])->name('topics.index');
+        Route::post('/topics/register', [StudentTopicController::class, 'register'])->name('topics.register');
+    });
+
 });
-
-
-// ==========================================
-// 1. KHU VỰC ADMIN (Gom nhóm prefix)
-// ==========================================
-Route::prefix('admin')->name('admin.')->group(function () {
-
-    // STUDENTS (Sẽ tự động thành URL: /admin/students và Tên route: admin.students.index)
-    Route::get('/students', [StudentController::class, 'index'])->name('students.index');
-    Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
-    Route::post('/students', [StudentController::class, 'store'])->name('students.store');
-
-});
-
-
-// =====================================================
-// STUDENTS - MODULE CỦA CƠ
-// =====================================================
-
-Route::prefix('admin/students')->name('admin.students.')->group(function () {
-
-    // Danh sách sinh viên
-    Route::get('/', [StudentController::class, 'index'])
-        ->name('index');
-
-    // Form thêm sinh viên
-    Route::get('/create', [StudentController::class, 'create'])
-        ->name('create');
-
-    // Lưu sinh viên mới
-    Route::post('/', [StudentController::class, 'store'])
-        ->name('store');
-
-    // Form sửa sinh viên
-    Route::get('/{student}/edit', [StudentController::class, 'edit'])
-        ->name('edit');
-
-    // Cập nhật sinh viên
-    Route::put('/{student}', [StudentController::class, 'update'])
-        ->name('update');
-
-    // Xóa sinh viên
-    Route::delete('/{student}', [StudentController::class, 'destroy'])
-        ->name('destroy');
-});
-
-
-// =====================================================
-// TOPIC REGISTRATIONS
-// =====================================================
-
-// Danh sách đơn đăng ký
-Route::get('/topic-registrations', [TopicRegistrationController::class, 'index'])
-    ->name('admin.topic_registrations.index');
-
-// Cập nhật trạng thái đơn đăng ký
-Route::put('/topic-registrations/{registration}/status', [TopicRegistrationController::class, 'updateStatus'])
-    ->name('admin.topic_registrations.update_status');
-
-// Xóa đơn đăng ký
-Route::delete('/topic-registrations/{id}', [TopicRegistrationController::class, 'destroy'])
-    ->name('admin.topic_registrations.destroy');
-
-
-// =====================================================
-// KHU VỰC SINH VIÊN - CLIENT SITE// =====================================================
-
-Route::prefix('student')->name('student.')->group(function () {
-
-    // Xem danh sách đề tài
-    Route::get('/topics', [StudentTopicController::class, 'index'])
-        ->name('topics.index');
-
-    // Gửi form đăng ký đề tài
-    Route::post('/topics/register', [StudentTopicController::class, 'register'])
-        ->name('topics.register');
-});
-
-
-// =====================================================
-// LECTURERS - MODULE CỦA BẠN
-// =====================================================
-
-Route::resource('lecturers', LecturerController::class)
-    ->except(['show']);
-
-
-// =====================================================
-// SPECIALIZATIONS - MODULE CỦA BẠN
-// =====================================================
-
-Route::resource('specializations', SpecializationController::class)
-    ->except(['show']);
-
-
-// =====================================================
-// TOPIC ASSIGNMENTS - MODULE CỦA BẠN
-// =====================================================
-
-Route::resource('topic-assignments', TopicAssignmentController::class)
-    ->except(['show']);
-
-
-// =====================================================
-// EVALUATION SCORES - MODULE CỦA BẠN
-// =====================================================
-
-// Danh sách điểm đánh giá
-Route::get('/evaluation-scores', [EvaluationScoreController::class, 'index'])
-    ->name('evaluation-scores.index');
-
-// Form nhập điểm
-Route::get('/evaluation-scores/create/{topicAssignment}', [EvaluationScoreController::class, 'create'])
-    ->name('evaluation-scores.create');
-
-// Lưu điểm đánh giá
-Route::post('/evaluation-scores/{topicAssignment}', [EvaluationScoreController::class, 'store'])
-    ->name('evaluation-scores.store');
-
-
-// =====================================================
-// TOPICS - MODULE CỦA VIỆT
-// =====================================================
-
-// CRUD đề tài
-Route::resource('topics', TopicController::class);
-// =====================================================
-// MILESTONES - MODULE QUẢN LÝ TIẾN ĐỘ
-// =====================================================
-
-Route::resource('milestones', MilestoneController::class);
-// =====================================================
-// MILESTONE SUBMISSIONS
-// =====================================================
-
-Route::resource(
-    'milestone-submissions',
-    MilestoneSubmissionController::class
-);
-Route::resource(
-    'evaluation-criterias',
-    EvaluationCriteriaController::class
-);

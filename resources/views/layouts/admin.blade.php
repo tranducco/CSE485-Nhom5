@@ -3,15 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
     <title>
         @yield('title', 'Quản lý Đồ án')
     </title>
 
     <style>
-
         * {
             margin: 0;
             padding: 0;
@@ -37,6 +34,12 @@
             color: white;
             padding: 20px;
             flex-shrink: 0;
+            display: flex; /* Thay đổi để đẩy nút đăng xuất xuống đáy */
+            flex-direction: column;
+        }
+        
+        .sidebar-menu {
+            flex-grow: 1; /* Cho phép phần menu tự động kéo dài chiếm hết không gian trống */
         }
 
         .sidebar h2 {
@@ -44,7 +47,7 @@
             font-size: 22px;
         }
 
-        .sidebar a {
+        .sidebar a, .sidebar button.logout-btn {
             display: block;
             color: white;
             text-decoration: none;
@@ -52,14 +55,28 @@
             margin-bottom: 5px;
             border-radius: 6px;
             transition: 0.2s;
+            width: 100%;
+            text-align: left;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .sidebar a.active {
             background: #2563eb;
         }
 
-        .sidebar a:hover {
+        .sidebar a:hover, .sidebar button.logout-btn:hover {
             background: #374151;
+        }
+
+        .sidebar button.logout-btn {
+            color: #fca5a5; /* Nút đăng xuất có màu đỏ nhạt */
+        }
+        
+        .sidebar button.logout-btn:hover {
+            background: #7f1d1d; /* Màu hover khi nhấn đăng xuất */
         }
 
         .menu-title {
@@ -85,6 +102,9 @@
             border-bottom: 1px solid #ddd;
             font-size: 22px;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .main {
@@ -262,7 +282,6 @@
         .back-link:hover {
             text-decoration: underline;
         }
-
     </style>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -271,117 +290,128 @@
 
 <body>
 
-<div class="wrapper">
+    <div class="wrapper">
 
-    <!-- SIDEBAR -->
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-menu">
+                <h2>Quản lý Đồ án</h2>
 
-    <div class="sidebar">
+                <a href="/">
+                    🏠 Trang chủ
+                </a>
 
-        <h2>QL Đồ Án</h2>
+                <!-- ================= CHỈ HIỂN THỊ KHI LÀ ADMIN ================= -->
+                @if (Auth::user() && Auth::user()->role === 'admin')
+                    <!-- SINH VIÊN -->
+                    <div class="menu-title">
+                        SINH VIÊN
+                    </div>
 
-        <a href="#">
-            🏠 Dashboard
-        </a>
+                    <a class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}" href="{{ route('admin.students.index') }}">
+                        👨‍🎓 Quản lý Sinh viên
+                    </a>
+                    
+                    <a class="{{ request()->routeIs('admin.topic_registrations.*') ? 'active' : '' }}" href="{{ route('admin.topic_registrations.index') }}">
+                        📌 Đơn đăng ký Đề tài
+                    </a>
 
-        <!-- SINH VIÊN -->
+                    <!-- GIẢNG VIÊN & PHÂN CÔNG -->
+                    <div class="menu-title">
+                        GIẢNG VIÊN & PHÂN CÔNG
+                    </div>
 
-        <div class="menu-title">
-            SINH VIÊN
+                    <a class="{{ request()->routeIs('lecturers.*') ? 'active' : '' }}" href="{{ route('lecturers.index') }}">
+                        👨‍🏫 Giảng viên
+                    </a>
+
+                    <a class="{{ request()->routeIs('specializations.*') ? 'active' : '' }}" href="{{ route('specializations.index') }}">
+                        📚 Chuyên môn
+                    </a>
+
+                    <a class="{{ request()->routeIs('topic-assignments.*') ? 'active' : '' }}" href="{{ route('topic-assignments.index') }}">
+                        📋 Phân công hướng dẫn
+                    </a>
+
+                    <!-- ĐỀ TÀI & TIẾN ĐỘ -->
+                    <div class="menu-title">
+                        ĐỀ TÀI & TIẾN ĐỘ
+                    </div>
+
+                    <a class="{{ request()->routeIs('topics.*') ? 'active' : '' }}" href="{{ route('topics.index') }}">
+                        📌 Quản lý Đề tài
+                    </a>
+                    
+                    <a class="{{ request()->routeIs('milestones.*') ? 'active' : '' }}" href="{{ route('milestones.index') }}">
+                        📅 Quản lý mốc thực hiện
+                    </a>
+                    
+                    <a class="{{ request()->routeIs('milestone-submissions.*') ? 'active' : '' }}" href="{{ route('milestone-submissions.index') }}">
+                        📄 Bài nộp milestone
+                    </a>
+                    
+                    <a class="{{ request()->routeIs('evaluation-criterias.*') ? 'active' : '' }}" href="{{ route('evaluation-criterias.index') }}">
+                        📊 Tiêu chí đánh giá
+                    </a>
+                @endif
+                <!-- ================= VÙNG CHUNG (Cả Admin và Giảng viên đều xem được) ================= -->
+                @if (Auth::user() && in_array(Auth::user()->role, ['admin', 'lecturer']))
+                    <div class="menu-title">TIẾN ĐỘ & CHẤM ĐIỂM</div>
+                    
+                    <a class="{{ request()->routeIs('milestones.*') ? 'active' : '' }}" href="{{ route('milestones.index') }}">
+                        📅 Quản lý mốc thực hiện
+                    </a>
+                    
+                    <a class="{{ request()->routeIs('milestone-submissions.*') ? 'active' : '' }}" href="{{ route('milestone-submissions.index') }}">
+                        📄 Bài nộp milestone
+                    </a>
+
+                    <a class="{{ request()->routeIs('evaluation-scores.*') ? 'active' : '' }}" href="{{ route('evaluation-scores.index') }}">
+                        ⭐ Điểm đánh giá
+                    </a>
+                @endif
+            </div>
+
+            <!-- NÚT ĐĂNG XUẤT NẰM Ở CUỐI SIDEBAR -->
+            <div class="sidebar-footer mt-auto">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="logout-btn">
+                        🚪 Đăng xuất
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <a
-            class="{{ request()->routeIs('admin.students.*') ? 'active' : '' }}"
-            href="{{ route('admin.students.index') }}"
-        >
-            👨‍🎓 Quản lý Sinh viên
-        </a>
-        <a href="{{ route('admin.topic_registrations.index') }}" class="nav-link">
-    📌 Đơn đăng ký Đề tài
-        </a>
-        <!-- MODULE CỦA BẠN -->
+        <!-- CONTENT -->
+        <div class="content">
 
-        <div class="menu-title">
-            GIẢNG VIÊN & PHÂN CÔNG
+            <div class="topbar">
+                <div>@yield('title', 'Quản lý Đồ án')</div>
+                
+                <!-- Hiển thị tên người đang đăng nhập trên góc phải -->
+                @if (Auth::check())
+                    <div style="font-size: 16px; font-weight: normal; color: #4b5563;">
+                        Chào, <strong>{{ Auth::user()->name }}</strong> ({{ ucfirst(Auth::user()->role) }})
+                    </div>
+                @endif
+            </div>
+
+            <div class="main">
+                <!-- Hiển thị lỗi chung (như lỗi 403 mình xử lý lúc nãy) -->
+                @if(session('error'))
+                    <div class="alert alert-danger" style="background: #fee2e2; color: #991b1b; padding: 12px; margin-bottom: 15px; border-radius: 6px;">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                
+                @yield('content')
+            </div>
+
         </div>
-
-        <a
-            class="{{ request()->routeIs('lecturers.*') ? 'active' : '' }}"
-            href="{{ route('lecturers.index') }}"
-        >
-            👨‍🏫 Giảng viên
-        </a>
-
-        <a
-            class="{{ request()->routeIs('specializations.*') ? 'active' : '' }}"
-            href="{{ route('specializations.index') }}"
-        >
-            📚 Chuyên môn
-        </a>
-
-        <a
-            class="{{ request()->routeIs('topic-assignments.*') ? 'active' : '' }}"
-            href="{{ route('topic-assignments.index') }}"
-        >
-            📋 Phân công hướng dẫn
-        </a>
-
-        <a
-            class="{{ request()->routeIs('evaluation-scores.*') ? 'active' : '' }}"
-            href="{{ route('evaluation-scores.index') }}"
-        >
-            ⭐ Điểm đánh giá
-        </a>
-
-        <!-- ĐỀ TÀI -->
-
-        <div class="menu-title">
-            ĐỀ TÀI & TIẾN ĐỘ
-        </div>
-
-        <a
-            class="{{ request()->routeIs('topics.*') ? 'active' : '' }}"
-            href="{{ route('topics.index') }}"
-        >
-            📌 Quản lý Đề tài
-        </a>
-             <a
-            class="{{ request()->routeIs('milestones.*') ? 'active' : '' }}"
-            href="{{ route('milestones.index') }}"
-        >
-            📅 Quản lý mốc thực hiện
-        </a>
-        <a
-            class="{{ request()->routeIs('milestone-submissions.*') ? 'active' : '' }}"
-            href="{{ route('milestone-submissions.index') }}"
-        >
-        📄 Bài nộp milestone
-        </a>
-        <a
-            class="{{ request()->routeIs('evaluation-criterias.*') ? 'active' : '' }}"
-            href="{{ route('evaluation-criterias.index') }}"
-        >
-        📊 Tiêu chí đánh giá
-        </a>
-        
 
     </div>
-
-
-    <!-- CONTENT -->
-
-    <div class="content">
-
-        <div class="topbar">
-            @yield('title', 'Quản lý Đồ án')
-        </div>
-
-        <div class="main">
-            @yield('content')
-        </div>
-
-    </div>
-
-</div>
 
 </body>
+
 </html>
