@@ -100,7 +100,7 @@ Route::middleware('auth')->group(function () {
         // Trang thông tin tổng quan (Dashboard Sinh viên) - Vừa thêm!
         Route::get('/dashboard', [StudentTopicController::class, 'dashboard'])->name('dashboard');
         // Route xử lý việc nộp bài cho một mốc cụ thể
-    Route::post('/milestones/{milestone}/submit', [StudentMilestoneController::class, 'submit'])->name('milestones.submit');
+        Route::post('/milestones/{milestone}/submit', [\App\Http\Controllers\Student\TopicController::class, 'submitMilestone'])->name('milestones.submit');
         // Đăng ký đề tài
         Route::get('/topics', [StudentTopicController::class, 'index'])->name('topics.index');
         Route::post('/topics/register', [StudentTopicController::class, 'register'])->name('topics.register');
