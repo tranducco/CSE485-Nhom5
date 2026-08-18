@@ -30,7 +30,6 @@
     <table>
 
         <thead>
-
             <tr>
                 <th>ID</th>
                 <th>Giảng viên</th>
@@ -41,12 +40,26 @@
                 <th>Điểm</th>
                 <th>Thao tác</th>
             </tr>
-
         </thead>
 
         <tbody>
 
         @forelse($assignments as $assignment)
+
+            @php
+                $totalScore = $assignment->evaluationScores->sum('score');
+
+                $maxScore = $assignment->evaluationScores
+                    ->sum(function ($score) {
+                        return $score->evaluationCriteria->max_score ?? 0;
+                    });
+
+                $hasScore = $assignment->evaluationScores->isNotEmpty();
+
+                $percentage = $maxScore > 0
+                    ? round(($totalScore / $maxScore) * 100, 2)
+                    : 0;
+            @endphp
 
             <tr>
 
@@ -76,11 +89,17 @@
 
                 <td>
 
-                    @if($assignment->evaluationScore)
+                    @if($hasScore)
 
                         <strong style="color:#16a34a;">
-                            {{ $assignment->evaluationScore->score }}/10
+                            {{ $totalScore }}/{{ $maxScore }}
                         </strong>
+
+                        <br>
+
+                        <small style="color:#6b7280;">
+                            {{ $percentage }}%
+                        </small>
 
                     @else
 
@@ -115,7 +134,7 @@
                             ) }}"
                             class="btn-score"
                         >
-                            @if($assignment->evaluationScore)
+                            @if($hasScore)
                                 Sửa điểm
                             @else
                                 Nhập điểm
@@ -159,7 +178,6 @@
                     style="text-align:center;"
                 >
                     Chưa có phân công.
-
                 </td>
 
             </tr>

@@ -9,12 +9,15 @@ use Illuminate\Http\Request;
 
 class TopicAssignmentController extends Controller
 {
+    /**
+     * Hiển thị danh sách phân công.
+     */
     public function index()
     {
         $assignments = TopicAssignment::with([
             'lecturer.specialization',
             'topic',
-            'evaluationScore'
+            'evaluationScores.evaluationCriteria',
         ])
         ->orderByDesc('assigned_date')
         ->get();
@@ -25,13 +28,15 @@ class TopicAssignmentController extends Controller
         );
     }
 
+    /**
+     * Form thêm phân công.
+     */
     public function create()
     {
         $lecturers = Lecturer::with('specialization')
             ->orderBy('name')
             ->get();
 
-        // LẤY BẢNG TOPICS CỦA MODULE BẠN VIỆT
         $topics = Topic::orderBy('code')->get();
 
         return view(
@@ -40,18 +45,21 @@ class TopicAssignmentController extends Controller
         );
     }
 
+    /**
+     * Lưu phân công.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
             'lecturer_id' => 'required|exists:lecturers,id',
-
-            // Liên kết sang topics của người khác
             'topic_id' => 'required|exists:topics,id',
-
             'assigned_date' => 'required|date',
         ]);
 
-        // Không cho cùng một GV được phân công cùng một đề tài 2 lần
+        /*
+         * Không cho cùng một giảng viên
+         * được phân công cùng một đề tài 2 lần.
+         */
         $exists = TopicAssignment::where(
             'lecturer_id',
             $validated['lecturer_id']
@@ -67,7 +75,7 @@ class TopicAssignmentController extends Controller
                 ->withInput()
                 ->withErrors([
                     'topic_id' =>
-                        'Giảng viên này đã được phân công đề tài này.'
+                        'Giảng viên này đã được phân công đề tài này.',
                 ]);
         }
 
@@ -81,6 +89,9 @@ class TopicAssignmentController extends Controller
             );
     }
 
+    /**
+     * Form sửa phân công.
+     */
     public function edit(TopicAssignment $topicAssignment)
     {
         $lecturers = Lecturer::with('specialization')
@@ -99,6 +110,9 @@ class TopicAssignmentController extends Controller
         );
     }
 
+    /**
+     * Cập nhật phân công.
+     */
     public function update(
         Request $request,
         TopicAssignment $topicAssignment
@@ -109,6 +123,10 @@ class TopicAssignmentController extends Controller
             'assigned_date' => 'required|date',
         ]);
 
+        /*
+         * Không cho tạo phân công trùng,
+         * ngoại trừ chính bản ghi đang sửa.
+         */
         $exists = TopicAssignment::where(
             'lecturer_id',
             $validated['lecturer_id']
@@ -129,7 +147,7 @@ class TopicAssignmentController extends Controller
                 ->withInput()
                 ->withErrors([
                     'topic_id' =>
-                        'Giảng viên này đã được phân công đề tài này.'
+                        'Giảng viên này đã được phân công đề tài này.',
                 ]);
         }
 
@@ -143,6 +161,9 @@ class TopicAssignmentController extends Controller
             );
     }
 
+    /**
+     * Xóa phân công.
+     */
     public function destroy(
         TopicAssignment $topicAssignment
     ) {

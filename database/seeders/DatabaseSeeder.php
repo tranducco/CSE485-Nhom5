@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
 
             // Phải chạy sau Lecturer + Topic
             TopicAssignmentSeeder::class,
+            EvaluationCriteriaSeeder::class,
 
             // Phải chạy sau TopicAssignment
             EvaluationScoreSeeder::class,
