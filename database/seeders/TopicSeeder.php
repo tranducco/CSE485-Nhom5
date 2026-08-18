@@ -35,7 +35,7 @@ class TopicSeeder extends Seeder
                 'code' => 'TP003',
                 'title' => 'Quản lý đồ án tốt nghiệp',
                 'description' => 'Hệ thống đăng ký đề tài',
-                'max_students' => 2,
+                'max_students' => 1,
                 'status' => 'Open',
                 'created_at' => now(),
                 'updated_at' => now(),
